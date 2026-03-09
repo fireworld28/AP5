@@ -5,10 +5,11 @@ $connexion = new PDO("mysql:host=$host;dbname=$dbname;charset=$charset", $user, 
 
 //  On récupère les données des deux tables
 $reqMach = $connexion->query('SELECT * FROM MACHINE');
-$machines = [];
+$machines = $reqMach->fetchAll(\PDO::FETCH_ASSOC);
+/*$machines = [];
 while ($row = $reqMach->fetch(\PDO::FETCH_ASSOC)) {
     $machines[$row['id_mach']] = $row;
-}
+}*/
 
 $reqMat = $connexion->query('SELECT * FROM MATERIEL');
 $materiels = $reqMat->fetchAll(\PDO::FETCH_ASSOC);
@@ -18,11 +19,11 @@ $affichage_complet = [];
 
 foreach ($machines as $id => $m) {
     $affichage_complet[] = [
-        'id'     => $id,
+        'id'     => $m['id_mach'],
         'nom'    => $m['nom_mach'],
-        'annee'  => $m['anne_mach'] ?? null,
-        'details'=> $m['det_mach'] ?? null,
-        'type'   => $m['typ_mach'] ?? null,
+        'annee'  => $m['anne_mach'],
+        'details'=> $m['det_mach'],
+        'type'   => $m['typ_mach'],
         'parent' => null
     ];
 }
@@ -36,11 +37,6 @@ foreach ($materiels as $m) {
         'parent' => $m['id_mach_par']
     ];
 }
-
-// On trie par ID
-usort($affichage_complet, function($a, $b) {
-    return $a['id'] <=> $b['id'];
-});
 
 // Fonction pour choisir la classe du badge selon le type
 function classeBadge(string $type): string {
