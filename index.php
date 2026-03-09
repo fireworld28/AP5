@@ -1,19 +1,19 @@
 <?php
+//Connexion à la base de données, on accède le fichier credentials pour pouvoir connecter à la base de données
 require('session/credentials.php');
 $connexion = new PDO("mysql:host=$host;dbname=$dbname;charset=$charset", $user, $password);
 
-// 1. On récupère les machines
+//  On récupère les données des deux tables
 $reqMach = $connexion->query('SELECT * FROM MACHINE');
 $machines = [];
 while ($row = $reqMach->fetch(\PDO::FETCH_ASSOC)) {
     $machines[$row['id_mach']] = $row;
 }
 
-// 2. On récupère le matériel
 $reqMat = $connexion->query('SELECT * FROM MATERIEL');
 $materiels = $reqMat->fetchAll(\PDO::FETCH_ASSOC);
 
-// 3. On fusionne : on ajoute les machines à la liste d'affichage
+// 3. On fusionne : on ajoute tout à la liste d'affichage
 $affichage_complet = [];
 
 foreach ($machines as $id => $m) {
@@ -26,7 +26,6 @@ foreach ($machines as $id => $m) {
         'parent' => null
     ];
 }
-
 foreach ($materiels as $m) {
     $affichage_complet[] = [
         'id'     => $m['id_mat'],
@@ -127,7 +126,7 @@ function classeBadge(string $type): string {
         </table>
     </div>
     <footer>
-        <p>AP4 — Inventaire SI &copy; <?= date('Y') ?></p>
+        <p>AP4 GROUPE SIO — Inventaire SI &copy; <?= date('Y') ?></p>
     </footer>
 
 </body>

@@ -1,8 +1,8 @@
 <?php
 $host = '127.0.0.1';
 $charset = 'utf8';
-$user = 'root';
+$user = '';
 $password = '';
-$dbname = 'si_bibliotheque';
+$dbname = '';
 $adminpassword = '';
 ?>
