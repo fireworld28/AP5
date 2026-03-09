@@ -4,7 +4,10 @@ $connexion = new PDO("mysql:host=$host;dbname=$dbname;charset=$charset", $user, 
 
 // 1. On récupère les machines
 $reqMach = $connexion->query('SELECT * FROM MACHINE');
-$machines = $reqMach->fetchAll(\PDO::FETCH_UNIQUE|\PDO::FETCH_ASSOC);
+$machines = [];
+while ($row = $reqMach->fetch(\PDO::FETCH_ASSOC)) {
+    $machines[$row['id_mach']] = $row;
+}
 
 // 2. On récupère le matériel
 $reqMat = $connexion->query('SELECT * FROM MATERIEL');
@@ -17,9 +20,9 @@ foreach ($machines as $id => $m) {
     $affichage_complet[] = [
         'id'     => $id,
         'nom'    => $m['nom_mach'],
-        'annee'  => $m['anne_mach'],
-        'details'=> $m['det_mach'],
-        'type'   => $m['typ_mach'],
+        'annee'  => $m['anne_mach'] ?? null,
+        'details'=> $m['det_mach'] ?? null,
+        'type'   => $m['typ_mach'] ?? null,
         'parent' => null
     ];
 }
