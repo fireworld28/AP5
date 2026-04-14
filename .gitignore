@@ -1,6 +1,6 @@
 # Fichier de credentials (contient les mots de passe — NE JAMAIS versionner)
 session/credentials.php
-
+session/verification.php
 # Fichiers systeme
 .DS_Store
 Thumbs.db
