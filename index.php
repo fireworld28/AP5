@@ -1,41 +1,22 @@
 <?php
-//Connexion à la base de données, on accède le fichier credentials pour pouvoir connecter à la base de données
 require('session/credentials.php');
-$connexion = new PDO("mysql:host=$host;dbname=$dbname;charset=$charset", $user, $password);
+session_start();
 
-//  On récupère les données des deux tables
-$reqMach = $connexion->query('SELECT * FROM MACHINE');
-$machines = $reqMach->fetchAll(\PDO::FETCH_ASSOC);
-/*$machines = [];
-while ($row = $reqMach->fetch(\PDO::FETCH_ASSOC)) {
-    $machines[$row['id_mach']] = $row;
-}*/
+$connexion = new PDO("mysql:host=127.0.0.1;port=3307;dbname=$dbname;charset=$charset", $user, $password);
+$connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$reqMat = $connexion->query('SELECT * FROM MATERIEL');
-$materiels = $reqMat->fetchAll(\PDO::FETCH_ASSOC);
-
-// 3. On fusionne : on ajoute tout à la liste d'affichage
-$affichage_complet = [];
-
-foreach ($machines as $id => $m) {
-    $affichage_complet[] = [
-        'id'     => $m['id_mach'],
-        'nom'    => $m['nom_mach'],
-        'annee'  => $m['anne_mach'],
-        'details'=> $m['det_mach'],
-        'type'   => $m['typ_mach'],
-        'parent' => null
-    ];
+// On récupère toutes les machines, indexées par leur id
+$requeteMachines = $connexion->query('SELECT * FROM machine ORDER BY id_mach');
+$tableauMachines = [];
+foreach ($requeteMachines->fetchAll(PDO::FETCH_ASSOC) as $ligne) {
+    $tableauMachines[$ligne['id_mach']] = $ligne;
 }
-foreach ($materiels as $m) {
-    $affichage_complet[] = [
-        'id'     => $m['id_mat'],
-        'nom'    => $m['nom_mat'],
-        'annee'  => $m['anne_mat'],
-        'details'=> $m['det_mat'],
-        'type'   => $m['typ_mat'],
-        'parent' => $m['id_mach_par']
-    ];
+
+// On récupère tous les matériels et on les regroupe par machine parente
+$requeteMateriels = $connexion->query('SELECT * FROM materiel ORDER BY id_mach_par, id_mat');
+$tableauMateriels = [];
+foreach ($requeteMateriels->fetchAll(PDO::FETCH_ASSOC) as $ligne) {
+    $tableauMateriels[$ligne['id_mach_par']][] = $ligne;
 }
 
 // Fonction pour choisir la classe du badge selon le type
@@ -67,8 +48,21 @@ function classeBadge(string $type): string {
 <body>
 
     <header>
-        <h1> Inventaire du parc informatique</h1>
-        <p>Liste des machines et de leur matériel associé</p>
+        <div class="header-inner">
+            <div>
+                <h1>Inventaire du parc informatique</h1>
+                <p>Liste des machines et de leur matériel associé</p>
+            </div>
+            <nav class="header-nav">
+                <a href="recherche.php" class="btn btn-secondary">Recherche</a>
+                <?php if (isset($_SESSION['admin']) && $_SESSION['admin'] === true): ?>
+                    <a href="admin/ajout.php" class="btn btn-success">Ajouter</a>
+                    <a href="deconnexion.php" class="btn btn-danger">Deconnexion</a>
+                <?php else: ?>
+                    <a href="connexion.php" class="btn btn-primary">Administration</a>
+                <?php endif; ?>
+            </nav>
+        </div>
     </header>
 
     <div class="conteneur-tableau">
@@ -81,48 +75,87 @@ function classeBadge(string $type): string {
                     <th>Détails</th>
                     <th>Type</th>
                     <th>Appartient à</th>
+                    <?php if (isset($_SESSION['admin']) && $_SESSION['admin'] === true): ?>
+                        <th>Actions</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($affichage_complet as $item): ?>
-                    <?php $est_principal = empty($item['parent']); ?>
-                    <tr class="<?= $est_principal ? 'principal' : '' ?>">
+                <?php foreach ($tableauMachines as $machine): ?>
 
-                        <td><?= $item['id'] ?></td>
-
-                        <td><?= htmlspecialchars($item['nom'] ?? '') ?></td>
-
-                        <td><?= htmlspecialchars($item['annee'] ?? '') ?></td>
-
+                    <!-- Ligne de la machine principale -->
+                    <tr class="principal">
                         <td>
-                            <?php if (!empty($item['details'])): ?>
-                                <?= htmlspecialchars($item['details']) ?>
+                            <a href="machine.php?id=<?= $machine['id_mach'] ?>">
+                                <?= $machine['id_mach'] ?>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="machine.php?id=<?= $machine['id_mach'] ?>">
+                                <?= htmlspecialchars($machine['nom_mach']) ?>
+                            </a>
+                        </td>
+                        <td><?= htmlspecialchars($machine['anne_mach']) ?></td>
+                        <td>
+                            <?php if (!empty($machine['det_mach'])): ?>
+                                <?= htmlspecialchars($machine['det_mach']) ?>
                             <?php else: ?>
                                 <span class="vide">—</span>
                             <?php endif; ?>
                         </td>
-
                         <td>
-                            <span class="badge <?= classeBadge($item['type'] ?? '') ?>">
-                                <?= htmlspecialchars($item['type'] ?? '') ?>
+                            <span class="badge <?= classeBadge($machine['typ_mach']) ?>">
+                                <?= htmlspecialchars($machine['typ_mach']) ?>
                             </span>
                         </td>
-
-                        <td>
-                            <?php if (!$est_principal && isset($machines[$item['parent']])): ?>
-                                <?= htmlspecialchars($machines[$item['parent']]['nom_mach']) ?>
-                            <?php else: ?>
-                                <span class="vide">—</span>
-                            <?php endif; ?>
-                        </td>
-
+                        <td><span class="vide">—</span></td>
+                        <?php if (isset($_SESSION['admin']) && $_SESSION['admin'] === true): ?>
+                            <td class="actions">
+                                <a href="admin/modification.php?table=machine&id=<?= $machine['id_mach'] ?>" class="btn-sm btn-edit">Modifier</a>
+                                <a href="admin/suppression.php?table=machine&id=<?= $machine['id_mach'] ?>" class="btn-sm btn-delete"
+                                   onclick="return confirm('Supprimer cette machine et tout son materiel ?')">Supprimer</a>
+                            </td>
+                        <?php endif; ?>
                     </tr>
+
+                    <!-- Lignes des matériels associés à cette machine -->
+                    <?php if (!empty($tableauMateriels[$machine['id_mach']])): ?>
+                        <?php foreach ($tableauMateriels[$machine['id_mach']] as $materiel): ?>
+                            <tr>
+                                <td><?= $materiel['id_mat'] ?></td>
+                                <td><?= htmlspecialchars($materiel['nom_mat']) ?></td>
+                                <td><?= htmlspecialchars($materiel['anne_mat']) ?></td>
+                                <td>
+                                    <?php if (!empty($materiel['det_mat'])): ?>
+                                        <?= htmlspecialchars($materiel['det_mat']) ?>
+                                    <?php else: ?>
+                                        <span class="vide">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span class="badge <?= classeBadge($materiel['typ_mat']) ?>">
+                                        <?= htmlspecialchars($materiel['typ_mat']) ?>
+                                    </span>
+                                </td>
+                                <td><?= htmlspecialchars($machine['nom_mach']) ?></td>
+                                <?php if (isset($_SESSION['admin']) && $_SESSION['admin'] === true): ?>
+                                    <td class="actions">
+                                        <a href="admin/modification.php?table=materiel&id=<?= $materiel['id_mat'] ?>" class="btn-sm btn-edit">Modifier</a>
+                                        <a href="admin/suppression.php?table=materiel&id=<?= $materiel['id_mat'] ?>" class="btn-sm btn-delete"
+                                           onclick="return confirm('Supprimer ce materiel ?')">Supprimer</a>
+                                    </td>
+                                <?php endif; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
     <footer>
-        <p>AP4 GROUPE SIO — Inventaire SI &copy; <?= date('Y') ?></p>
+        <p>AP5 GROUPE SIO — Inventaire SI &copy; <?= date('Y') ?></p>
     </footer>
 
 </body>

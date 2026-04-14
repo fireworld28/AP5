@@ -1,5 +1,5 @@
 /* ============================================
-   INVENTAIRE SI — Style moderne épuré blanc/bleu
+   INVENTAIRE SI — Style moderne epure blanc/bleu
    ============================================ */
 
 /* --- Variables de couleurs --- */
@@ -13,10 +13,10 @@
     --gris-bord      : #e2e8f0;
     --gris-texte     : #475569;
     --noir-titre     : #0f172a;
-    --vert-badge     : #dcfce7;
-    --vert-texte     : #166534;
-    --orange-badge   : #fef3c7;
-    --orange-texte   : #92400e;
+    --vert           : #16a34a;
+    --vert-clair     : #dcfce7;
+    --rouge          : #dc2626;
+    --rouge-clair    : #fee2e2;
 }
 
 /* --- Reset de base --- */
@@ -32,13 +32,26 @@ body {
     background-color: var(--gris-clair);
     color: var(--noir-titre);
     min-height: 100vh;
-    padding: 40px 20px;
+    padding: 0 0 40px;
 }
 
-/* --- En-tête de la page --- */
+/* --- En-tete de la page --- */
 header {
-    text-align: center;
-    margin-bottom: 36px;
+    background-color: var(--blanc);
+    border-bottom: 1px solid var(--gris-bord);
+    padding: 18px 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.06);
+}
+
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 header h1 {
@@ -53,6 +66,65 @@ header p {
     color: var(--gris-texte);
     font-size: 0.95rem;
 }
+
+.header-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lien-retour {
+    color: var(--bleu-accent);
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.lien-retour:hover {
+    text-decoration: underline;
+}
+
+/* --- Boutons --- */
+.btn {
+    display: inline-block;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.btn-primary   { background-color: var(--bleu-principal); color: var(--blanc); }
+.btn-secondary { background-color: var(--gris-bord);      color: var(--gris-texte); }
+.btn-success   { background-color: var(--vert);            color: var(--blanc); }
+.btn-danger    { background-color: var(--rouge);           color: var(--blanc); }
+
+.btn-block {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    margin-top: 8px;
+}
+
+/* --- Petits boutons d'action dans le tableau --- */
+.btn-sm {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    margin-right: 4px;
+}
+
+.btn-edit   { background-color: var(--bleu-clair);  color: var(--bleu-principal); }
+.btn-delete { background-color: var(--rouge-clair); color: var(--rouge); }
 
 /* --- Conteneur du tableau --- */
 .conteneur-tableau {
@@ -71,7 +143,7 @@ table {
     border-collapse: collapse;
 }
 
-/* --- En-têtes du tableau --- */
+/* --- En-tetes du tableau --- */
 thead tr {
     background-color: var(--bleu-principal);
 }
@@ -94,14 +166,14 @@ tbody td {
     border-bottom: 1px solid var(--gris-bord);
 }
 
-/* --- Lignes machines principales (en gras, fond bleu très clair) --- */
+/* --- Lignes machines principales --- */
 tbody tr.principal td {
     background-color: var(--bleu-hover);
     color: var(--noir-titre);
     font-weight: 600;
 }
 
-/* --- Lignes matériel (légèrement indentées visuellement) --- */
+/* --- Indentation visuelle des matériels --- */
 tbody tr:not(.principal) td:nth-child(2) {
     padding-left: 30px;
     color: var(--gris-texte);
@@ -119,6 +191,30 @@ tbody td:first-child {
     font-size: 0.82rem;
     color: var(--bleu-accent);
     font-weight: 500;
+}
+
+/* --- Liens dans le tableau --- */
+tbody td a {
+    color: var(--bleu-principal);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+tbody td a:hover {
+    text-decoration: underline;
+}
+
+td.actions {
+    white-space: nowrap;
+}
+
+/* --- En-tete des resultats de recherche --- */
+.resultats-header {
+    padding: 12px 18px;
+    background-color: var(--gris-clair);
+    font-size: 0.85rem;
+    color: var(--gris-texte);
+    border-bottom: 1px solid var(--gris-bord);
 }
 
 /* --- Badge pour la colonne Type --- */
@@ -149,6 +245,143 @@ tbody td:first-child {
     font-size: 1.1rem;
 }
 
+/* --- Cartes formulaire et detail --- */
+.form-card,
+.detail-card {
+    background-color: var(--blanc);
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 4px 24px rgba(29, 78, 216, 0.07);
+    border: 1px solid var(--gris-bord);
+    margin-bottom: 24px;
+}
+
+.form-card   { max-width: 680px;  margin-left: auto; margin-right: auto; }
+.detail-card { max-width: 1100px; margin-left: auto; margin-right: auto; }
+
+.detail-card h2,
+.form-card h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--bleu-principal);
+    margin-bottom: 16px;
+}
+
+.card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* --- Tableau de detail (cle-valeur) --- */
+.table-detail {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-detail th,
+.table-detail td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--gris-bord);
+    font-size: 0.9rem;
+}
+
+.table-detail th {
+    color: var(--gris-texte);
+    font-weight: 600;
+    width: 140px;
+}
+
+.table-detail td {
+    color: var(--noir-titre);
+}
+
+/* --- Champs de formulaire --- */
+.champ {
+    margin-bottom: 16px;
+}
+
+.champ label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gris-texte);
+    margin-bottom: 5px;
+}
+
+.champ input,
+.champ select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--gris-bord);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--noir-titre);
+    background-color: var(--gris-clair);
+    transition: border-color 0.15s;
+}
+
+.champ input:focus,
+.champ select:focus {
+    outline: none;
+    border-color: var(--bleu-accent);
+    background-color: var(--blanc);
+}
+
+/* --- Ligne de champs cote a cote --- */
+.form-ligne {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.form-ligne .champ {
+    flex: 1;
+    min-width: 140px;
+}
+
+/* --- Onglets --- */
+.tab-switcher {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 7px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--gris-texte);
+    background-color: var(--gris-clair);
+    border: 1px solid var(--gris-bord);
+    transition: background-color 0.15s;
+}
+
+.tab.active,
+.tab:hover {
+    background-color: var(--bleu-principal);
+    color: var(--blanc);
+    border-color: var(--bleu-principal);
+}
+
+/* --- Alertes --- */
+.alerte {
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.alerte-succes { background-color: var(--vert-clair); color: #166534; border: 1px solid #86efac; }
+.alerte-erreur { background-color: var(--rouge-clair); color: var(--rouge); border: 1px solid #fca5a5; }
+
 /* --- Pied de page --- */
 footer {
     text-align: center;
@@ -156,11 +389,3 @@ footer {
     color: #94a3b8;
     font-size: 0.8rem;
 }
-
-
-
-
-
-
-
-
